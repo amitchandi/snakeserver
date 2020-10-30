@@ -74,6 +74,7 @@ export function AddRoutes(app: uWS.TemplatedApp, components: {[key: string]: any
                 roomName: data.roomName,
                 isGameRoom: data.isGameRoom,
                 ownerId: data.ownerId,
+                settings: data.settings
             });
         
             res.end(JSON.stringify(rooms.getRoomWithId(roomId)));
