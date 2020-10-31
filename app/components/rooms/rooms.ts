@@ -131,7 +131,7 @@ export function leaveRoom(data: {roomId: string, userId: string}, ws: uWS.WebSoc
         }
     }
     
-    ws.unsubscribe('rooms/' + room.id);
+    ws.unsubscribe('rooms/' + data.roomId);
     ws.send(JSON.stringify({
         event: 'leaveRoom',
         data: {
