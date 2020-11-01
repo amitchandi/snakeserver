@@ -35,6 +35,11 @@ function setReadyStatus(data: any, ws: uWS.WebSocket) {
     let user = users.getUser(data.userId);
     if (user !== undefined) {
         user.isReady = data.args.isReady;
+        let room = rooms.getRoomWithId(data.roomId);
+        let index = room.users.findIndex(user => {
+            user.id === user.id;
+        });
+        room.users[index] = user;
     }
     ws.publish('rooms/' + data.roomId, JSON.stringify({
         event: 'setReadyStatus',
