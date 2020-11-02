@@ -142,26 +142,27 @@ function reset(data: any, ws: uWS.WebSocket) {
 }
 
 /**
- * Send zoom event to all players except sender for 10 seconds
+ * Send zoom event to all players except sender
  */
 function zoom(data: any, ws: uWS.WebSocket) {
     ws.publish('rooms/' + data.roomId, JSON.stringify({
         event: 'zoom',
         data : {
-            type: 'start',
             args: data.args,
         }
     }));
+}
 
-    setTimeout(() => {
-        ws.publish('rooms/' + data.roomId, JSON.stringify({
-            event: 'zoom',
-            data : {
-                type: 'end',
-                args: data.args,
-            }
-        }));
-    }, 10 * 1000);
+/**
+ * Send slow event to  -- probably will delete, doesnt seem necessary
+ */
+function slow(data: any, ws: uWS.WebSocket) {
+    ws.send(JSON.stringify({
+        event: 'slow',
+        data : {
+            args: data.args,
+        }
+    }));
 }
 
 functions.push(startGame);
@@ -171,6 +172,7 @@ functions.push(die);
 functions.push(chatMessage);
 functions.push(winner);
 functions.push(zoom);
+functions.push(slow);
 
 export {
     functions
