@@ -154,11 +154,23 @@ function zoom(data: any, ws: uWS.WebSocket) {
 }
 
 /**
- * Send slow event to  -- probably will delete, doesnt seem necessary
+ * Send slow event to sender only -- might delete, doesnt seem necessary
  */
 function slow(data: any, ws: uWS.WebSocket) {
     ws.send(JSON.stringify({
         event: 'slow',
+        data : {
+            args: data.args,
+        }
+    }));
+}
+
+/**
+ * invincible slow event to sender only -- might delete, doesnt seem necessary
+ */
+function invincible(data: any, ws: uWS.WebSocket) {
+    ws.send(JSON.stringify({
+        event: 'invincible',
         data : {
             args: data.args,
         }
@@ -173,6 +185,7 @@ functions.push(chatMessage);
 functions.push(winner);
 functions.push(zoom);
 functions.push(slow);
+functions.push(invincible);
 
 export {
     functions
