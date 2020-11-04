@@ -111,6 +111,7 @@ export function leaveRoom(data: {roomId: string, userId: string}, ws: uWS.WebSoc
     if (room !== undefined) {
         let user = users.getUser(data.userId);
         if (user !== undefined) {
+            user.isReady = false;
             let i = room.users?.indexOf(user);
             if (i !== undefined)
                 console.log(room.users?.splice(i, 1)); // need to use db to get user
