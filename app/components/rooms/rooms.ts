@@ -90,6 +90,7 @@ export function joinRoom(data: {roomId: string, userId: string}, ws: uWS.WebSock
         ws.subscribe('rooms/' + room.id);
         let user = users.getUser(data.userId);
         if (user !== undefined) {
+            user.isReady = false;
             room.users?.push(user); // need to use db to get user
             ws.publish('rooms/' + room.id, JSON.stringify({
                 event: 'joinRoom',
