@@ -9,6 +9,7 @@ export type User = {
     name: string;
     isReady: boolean;
     state?: UserState;
+    wins: number;
 }
 
 export type Room = {

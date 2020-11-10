@@ -10,12 +10,14 @@ const users: {[key: string]: User} = {
         deviceId: '123',
         name: 'Baby Snake',
         isReady: false,
+        wins: 0,
     },
     '456': {
         id: v4(),
         deviceId: '456',
         name: 'Mama Snake',
         isReady: false,
+        wins: 0,
     }
 }; // temporary, will use mongo database
 
@@ -75,9 +77,20 @@ function createUser(data: {deviceId: string, name: string}) {
         deviceId: data.deviceId,
         name: data.name,
         isReady: false,
+        wins: 0,
     };
     users[data.deviceId] = user;
     return user;
+}
+
+/**
+ * Add to the win count of the user with the given id
+ */
+function addWin(data: {userId: string}) {
+    let user = getUser(data.userId);
+    if (user !== undefined) {
+        ++user.wins;
+    }
 }
 
 functions.push(getUsers);
@@ -85,6 +98,7 @@ functions.push(getUser);
 functions.push(updateUsername);
 functions.push(getUserWithDevice);
 functions.push(createUser);
+functions.push(addWin);
 
 export {
     functions
