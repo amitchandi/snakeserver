@@ -184,6 +184,7 @@ function gameState(data: any, ws: uWS.WebSocket) {
     let user = users.getUser(data.args.userId);
     if (user !== undefined) {
         user.gameState = data.args.gameState;
+        console.log(data.args.gameState);
     }
 }
 
