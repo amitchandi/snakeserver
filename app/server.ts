@@ -84,6 +84,10 @@ const app = uWS.App().ws('/*', {  // handle messages from client
             //delete users[json.deviceId];
           }
       }
+
+      if (code === 1006) {
+        console.log(message);
+      }
     }
 });
 
