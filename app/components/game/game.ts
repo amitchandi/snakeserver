@@ -177,6 +177,16 @@ function invincible(data: any, ws: uWS.WebSocket) {
     }));
 }
 
+/**
+ * Set the Game State of the user with the given userId
+ */
+function gameState(data: any, ws: uWS.WebSocket) {
+    let user = users.getUser(data.args.userId);
+    if (user !== undefined) {
+        user.gameState = data.args.gameState;
+    }
+}
+
 functions.push(startGame);
 functions.push(setReadyStatus);
 functions.push(eatPellet);
@@ -186,6 +196,7 @@ functions.push(winner);
 functions.push(zoom);
 functions.push(slow);
 functions.push(invincible);
+functions.push(gameState);
 
 export {
     functions
