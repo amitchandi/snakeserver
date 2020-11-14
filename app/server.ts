@@ -19,6 +19,7 @@ const maxBackPressure = 1024;
 const app = uWS.App().ws('/*', {  // handle messages from client
     maxBackpressure: maxBackPressure,
     idleTimeout: 120,
+    maxPayloadLength: 32 * 1024,
     open: (ws, req) => {
         
         // Authenticate with request headers
@@ -87,6 +88,7 @@ const app = uWS.App().ws('/*', {  // handle messages from client
 
       if (code === 1006) {
         console.log(message);
+        console.log(ws);
       }
     }
 });
