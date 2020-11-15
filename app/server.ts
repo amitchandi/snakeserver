@@ -19,7 +19,7 @@ const maxBackPressure = 1024;
 const app = uWS.App().ws('/*', {  // handle messages from client
     maxBackpressure: maxBackPressure,
     idleTimeout: 120,
-    maxPayloadLength: 32 * 1024,
+    maxPayloadLength: 64 * 1024, // 64 Mb
     open: (ws, req) => {
         
         // Authenticate with request headers

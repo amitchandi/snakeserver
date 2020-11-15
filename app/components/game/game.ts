@@ -166,7 +166,7 @@ function slow(data: any, ws: uWS.WebSocket) {
 }
 
 /**
- * invincible slow event to sender only -- might delete, doesnt seem necessary
+ * Send invincible slow event to sender only -- might delete, doesnt seem necessary
  */
 function invincible(data: any, ws: uWS.WebSocket) {
     ws.send(JSON.stringify({
@@ -180,11 +180,28 @@ function invincible(data: any, ws: uWS.WebSocket) {
 /**
  * Set the Game State of the user with the given userId
  */
-function gameState(data: any, ws: uWS.WebSocket) {
+function setGameState(data: any, ws: uWS.WebSocket) {
     let user = users.getUser(data.args.userId);
     if (user !== undefined) {
         user.gameState = data.args.gameState;
         console.log(data.args.gameState);
+    }
+}
+
+/**
+ * Get the Game State of the user with the given userId
+ */
+function getGameState(data: any, ws: uWS.WebSocket) {
+    let user = users.getUser(data.args.userId);
+    if (user !== undefined) {
+        ws.send(JSON.stringify({
+            event: 'getGameState',
+            data: {
+                userId: user.id,
+                username: user.name,
+                gameState: user.gameState,
+            }
+        }));
     }
 }
 
@@ -197,7 +214,8 @@ functions.push(winner);
 functions.push(zoom);
 functions.push(slow);
 functions.push(invincible);
-functions.push(gameState);
+functions.push(setGameState);
+functions.push(getGameState);
 
 export {
     functions
