@@ -43,7 +43,7 @@ export function getRoom(data: any, ws: uWS.WebSocket) {
             event: 'getRoom',
             data: {
                 args: {
-                    rooms: rooms[data.roomId]
+                    room: rooms[data.roomId]
                 }
             }
         }));
