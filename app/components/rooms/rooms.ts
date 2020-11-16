@@ -42,9 +42,7 @@ export function getRoom(data: any, ws: uWS.WebSocket) {
         ws.send(JSON.stringify({
             event: 'getRoom',
             data: {
-                args: {
-                    room: rooms[data.roomId]
-                }
+                room: rooms[data.roomId]
             }
         }));
     } else {
