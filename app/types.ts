@@ -1,16 +1,14 @@
+import { User } from "./models/User";
+
 export enum UserState {
     alive = 0,
     dead = 1,
 }
 
-export type User = {
-    id: string;
-    deviceId: string;
-    name: string;
-    isReady: boolean;
-    state?: UserState;
-    wins: number;
-    gameState?: GameState;
+export type inGameUser = {
+  userInfo: User;
+  gameState: UserState;
+  isReady: boolean;
 }
 
 export type Room = {
@@ -18,8 +16,9 @@ export type Room = {
     roomName: string;
     isGameRoom: boolean;
     inGame: boolean;
-    ownerId: User["id"]; // user id
-    users: Array<User>;
+    ownerId: User["_id"]; // user id
+    // users: inGameUser[];
+    users: Map<string, inGameUser>;
     settings: any;
 }
 
@@ -60,4 +59,12 @@ export enum TileType {
     PELLET = 2,
     WALL = 3,
     SPECIAL = 4,
+}
+
+export type UserData = {
+    userId?: string;
+    deviceId?: string;
+    isReady: boolean;
+    event?: string;
+    data?: object;
 }

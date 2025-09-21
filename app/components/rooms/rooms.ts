@@ -1,8 +1,10 @@
-import uWS from 'uWebSockets.js';
+import uWS, { WebSocket } from 'uWebSockets.js';
 import { v4 } from 'uuid';
 
-import { Room } from '../../types';
+import { Room, UserData } from '../../types';
 import { users } from '../users';
+
+import { app } from '../../server';
 
 const functions: Array<Function> = [];
 
@@ -11,10 +13,7 @@ const rooms: {[key: string]: Room} = {};
 /**
  * Get available rooms
  */
-export function getRooms(data: any, ws: uWS.WebSocket | undefined) {
-    //if (data?.parameters?.isGameRoom)
-    //    console.log();
-    
+export function getRooms(data: any, ws: WebSocket<UserData> | undefined) {
     if (ws !== undefined) {
         ws.send(JSON.stringify({
             event: 'getRooms',
@@ -37,7 +36,7 @@ export function getRoomWithId(roomId: string): Room {
 /**
  * Get room with given id
  */
-export function getRoom(data: any, ws: uWS.WebSocket) {
+export function getRoom(data: any, ws: WebSocket<UserData>) {
     if (ws !== undefined) {
         ws.send(JSON.stringify({
             event: 'getRoom',
@@ -71,8 +70,8 @@ export function createRoom(data: any) {
 /**
  * Delete room with given id
  */
-export function deleteRoom(data: {roomId: string}, ws: uWS.WebSocket) {
-    ws.publish('rooms/' + data.roomId, JSON.stringify({
+export function deleteRoom(data: {roomId: string}, ws: WebSocket<UserData>) {
+    app.publish('rooms/' + data.roomId, JSON.stringify({
         event: 'deleteRoom',
         data: {}
     }));
@@ -82,15 +81,18 @@ export function deleteRoom(data: {roomId: string}, ws: uWS.WebSocket) {
 /**
  * Join the room with the given roomId
  */
-export function joinRoom(data: {roomId: string, userId: string}, ws: uWS.WebSocket) {
+export async function joinRoom(data: {roomId: string, userId: string}, ws: WebSocket<UserData>) {
     var room = rooms[data.roomId];
-    if (room.users.findIndex(user => {return user.id === data.userId}) === -1) {
+    if (room.users.findIndex(user => {return user._id?.toString() == data.userId}) === -1) {
         ws.subscribe('rooms/' + room.id);
-        let user = users.getUser(data.userId);
+        let user = await users.getUserById(data.userId);
+        if (!user)
+            return;
         if (user !== undefined) {
-            user.isReady = false;
-            room.users?.push(user); // need to use db to get user
-            ws.publish('rooms/' + room.id, JSON.stringify({
+            // user.isReady = false;
+            ws.getUserData().isReady = false;
+            room.users?.push(user);
+            app.publish('rooms/' + room.id, JSON.stringify({
                 event: 'joinRoom',
                 data: {
                     user: user,
@@ -104,33 +106,35 @@ export function joinRoom(data: {roomId: string, userId: string}, ws: uWS.WebSock
 /**
  * Leave the room with the given roomId
  */
-export function leaveRoom(data: {roomId: string, userId: string}, ws: uWS.WebSocket) {
+export async function leaveRoom(data: {roomId: string, userId: string}, ws: WebSocket<UserData>) {
     let room = rooms[data.roomId];
-    
+
     if (room !== undefined) {
-        let user = users.getUser(data.userId);
+        let user = await users.getUserById(data.userId);
+        if (!user) return;
         if (user !== undefined) {
-            user.isReady = false;
+            // user.isReady = false;
+            ws.getUserData().isReady = false;
             let i = room.users?.indexOf(user);
             if (i !== undefined)
                 console.log(room.users?.splice(i, 1)); // need to use db to get user
 
-            if (room.users.length === 0 || room.ownerId === user.id) {
+            if (room.users.length === 0 || room.ownerId === user._id) {
                 deleteRoom({roomId: room.id}, ws);
                 console.log('deleted');
             } else if (room.users.length > 0) {
-                ws.publish('rooms/' + room.id, JSON.stringify({
+                app.publish('rooms/' + room.id, JSON.stringify({
                     event: 'leaveRoom',
                     data: {
-                        userId: user.id,
-                        username: user.name,
+                        userId: user._id,
+                        username: user.username,
                         room: room
                     }
                 }));
             }
         }
     }
-    
+
     ws.unsubscribe('rooms/' + data.roomId);
     ws.send(JSON.stringify({
         event: 'leaveRoom',
