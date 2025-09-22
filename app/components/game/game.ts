@@ -4,6 +4,7 @@ import { rooms } from '../rooms';
 import { users } from '../users';
 
 import { app } from '../../server';
+import { UserDto } from '../../models/User';
 
 const functions: Array<Function> = [];
 
@@ -76,9 +77,10 @@ function die(data: any, ws: WebSocket<UserData>) {
     }));
 
     // set the state of the user that sent this to 'dead'
-    let room: Room = rooms.getRoomWithId(data.roomId);
+    let room = rooms.getRoomWithId(data.roomId);
+    if (!room) return;
     room.users.forEach(user => {
-        if (user.userInfo._id === data.userId) {
+        if (user._id === data.userId) {
             user.gameState = UserState.dead;
         }
     });
@@ -87,7 +89,7 @@ function die(data: any, ws: WebSocket<UserData>) {
     // let alive = room.users.filter(user => {
     //     return user.gameState == UserState.alive
     // });
-    let alive: inGameUser[] = [];
+    let alive: UserDto[] = [];
     room.users.forEach(user => {
       if (user.gameState == UserState.alive) {
         alive.push(user);
@@ -97,8 +99,8 @@ function die(data: any, ws: WebSocket<UserData>) {
         winner({
             roomId: data.roomId,
             args: {
-                userId: alive[0].userInfo._id,
-                username: alive[0].userInfo.username,
+                userId: alive[0]._id,
+                username: alive[0].username,
             }
         }, ws);
 
@@ -139,9 +141,7 @@ function winner(data: any, ws: WebSocket<UserData>) {
  */
 function reset(data: any, ws: WebSocket<UserData>) {
     let room = rooms.getRoomWithId(data.roomId);
-    //room.users.forEach(user => {
-    //    user.isReady = false;
-    //});
+    if (!room) return;
     room.inGame = false;
     app.publish('rooms/' + data.roomId, JSON.stringify({
         event: 'reset',

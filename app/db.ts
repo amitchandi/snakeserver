@@ -1,17 +1,28 @@
 import { MongoClient, Db } from "mongodb";
 
-const uri = process.env.MONGO_URL as string;
-if (!uri) {
-  throw new Error("MONGO_URL environment variable is not set");
-}
-const dbName = "snake";
-
 let client: MongoClient | null = null;
 let db: Db | null = null;
+let uri: string | null = null;
+const dbName = "snake";
+
+export async function initDb() {
+  uri = process.env.MONGO_URL as string;
+  if (!uri) {
+    throw new Error("MONGO_URL environment variable is not set");
+  }
+
+  if (!client) {
+    client = new MongoClient(uri);
+    await client.connect();
+    console.log("MongoDB connected");
+  }
+
+  db = client.db(dbName);
+}
 
 export async function getDb(): Promise<Db> {
   if (db) return db; // Reuse existing connection
-
+  if (!uri) throw new Error("MONGO_URL environment variable is not set");
   if (!client) {
     client = new MongoClient(uri);
     await client.connect();

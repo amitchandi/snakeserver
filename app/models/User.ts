@@ -1,10 +1,31 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
+import { inGameUser, UserState } from "../types";
 
 export interface User {
-  _id?: ObjectId;
+  // _id?: ObjectId;
   email: string;
   username: string;
   password: string;
   wins?: number;
   gamesPlayed?: number;
+}
+
+export interface UserDto {
+  _id: string;
+  email: string;
+  username: string;
+  wins?: number;
+  gamesPlayed?: number;
+  gameState: UserState;
+}
+
+export function toInGameUserDto(user: WithId<User>) : UserDto {
+  return {
+    _id: user._id.toString(),
+    email: user.email,
+    username: user.username,
+    wins: user.wins,
+    gamesPlayed: user.gamesPlayed,
+    gameState: UserState.alive
+  };
 }

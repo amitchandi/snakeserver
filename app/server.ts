@@ -3,6 +3,11 @@ import { StringDecoder } from "string_decoder";
 import { Room, UserData } from "./types";
 import { components, rooms, users } from "./components";
 import { AddRoutes } from "./routes";
+import { toInGameUserDto } from "./models/User";
+import jwt from "jsonwebtoken";
+import { v4 } from "uuid";
+import { Lobby } from "./matchmaking/Lobby";
+import console from "console";
 
 const decoder = new StringDecoder("utf8");
 
@@ -13,7 +18,59 @@ export const activeUsers: Map<string, WebSocket<UserData>> = new Map();
 // Queue of waiting players
 let queue: string[] = []; // store userIds
 // Active lobbies
-const lobbies: Map<string, Lobby> = new Map();
+const waitingLobbies: Map<string, Lobby> = new Map();
+const inGameLobbies: Map<string, Lobby> = new Map();
+
+function lobbyTimerFN(lobbyId: string) {
+  console.log(new Date() + `: Lobby ${lobbyId} timeout finished`);
+
+  app.publish("lobby/" + lobbyId, JSON.stringify({
+    event: "game_start",
+    data: {},
+  }));
+}
+
+const MIN_PLAYERS = 2;
+const MAX_PLAYERS = 10;
+
+function tryCreateLobby() {
+
+  if (queue.length >= MIN_PLAYERS) {
+    // Take up to MAX_PLAYERS from queue
+    const players = queue.splice(0, Math.min(queue.length, MAX_PLAYERS));
+
+    // Generate a unique ID for the lobby
+    const lobbyId = v4();
+    const lobby: Lobby = {
+      id: lobbyId,
+      players,
+      state: "waiting",
+      countdown: setTimeout(() => lobbyTimerFN(lobbyId), 5 * 1000),
+    };
+    // lobbies.set(lobbyId, players);
+    waitingLobbies.set(lobbyId, lobby);
+
+    // Notify each player
+    players.forEach(p => {
+      const ws = activeUsers.get(p);
+      if (!ws) return;
+
+      ws.subscribe("lobby/" + lobbyId);
+
+      // ws.send(JSON.stringify({
+      //   action: "lobby_start",
+      //   lobbyId,
+      // }));
+    });
+
+    app.publish("lobby/" + lobbyId, JSON.stringify({
+      event: "lobby_found",
+      data: {}
+    }))
+
+    console.log(new Date() + `: Lobby ${lobbyId} created.`);
+  }
+}
 
 // an "app" is much like Express.js apps with URL routes,
 // here we handle WebSocket traffic on the wildcard "/*" route
@@ -24,6 +81,32 @@ const app = uWS.App().ws("/*", {
   maxPayloadLength: 64 * 1024, // 64 Mb
   open: (ws) => {
     // Authenticate with request headers
+    console.log("WebSocket opened");
+    console.log("token: " + JSON.stringify(ws.getUserData()));
+    //TODO: implement actual type
+    //@ts-ignore
+    const token = ws.getUserData().token;
+    jwt.verify(token, process.env.JWT_SECRET!, (err: any, decodedToken: any) => {
+      if (err) {
+        ws.close();
+      } else {
+        console.log(decodedToken)
+        activeUsers.set(decodedToken.id, ws as WebSocket<UserData>);
+        if (!queue.find((userId) => userId === decodedToken.id)) {
+          queue.push(decodedToken.id);
+          //TODO: optionally broadcast queue length
+          if (waitingLobbies.size == 0)
+            tryCreateLobby();
+          else {
+            // push player into existing lobby
+            const lobby = waitingLobbies.values().next().value as Lobby;
+            queue.splice(queue.indexOf(decodedToken.id), 1);
+            lobby.players.push(decodedToken.id);
+          }
+        }
+      }
+    })
+
     ws.send(
       JSON.stringify({
         event: "echo",
@@ -69,24 +152,19 @@ const app = uWS.App().ws("/*", {
       const userData = ws.getUserData() as UserData;
       console.log(userData);
       if (userData.userId !== null && userData.deviceId !== null) {
-        let user = await users.getUserById(userData.userId!);
-        if (!user) {
+        const res = await users.getUserById(userData.userId!);
+        if (!res) {
           console.log("User not found");
           return;
         }
-        if (user !== undefined) {
-          let _rooms: { [key: string]: Room } | undefined = rooms.getRooms(
-            null,
-            undefined,
-          );
-          for (let roomId in _rooms) {
-            let room = _rooms[roomId];
-            if (room.users.has(user._id.toString())) {
-              console.log(userData.userId + " delete from " + roomId);
-              room.users.delete(user._id.toString());
-            }
+        const user = toInGameUserDto(res);
+        let _rooms = rooms.getRooms(null, undefined);
+        _rooms.forEach((room, roomId) => {
+          if (room.users.has(user._id.toString())) {
+            console.log(userData.userId + " delete from " + roomId);
+            room.users.delete(user._id.toString());
           }
-        }
+        });
       }
     }
 
@@ -97,19 +175,26 @@ const app = uWS.App().ws("/*", {
   },
   upgrade: (res, req, context) => {
     console.log("upgrade");
-    console.log(res);
-    console.log(req);
-    console.log(context);
+    // console.log(res);
+    // console.log(req);
+    // console.log(context);
+
+    // console.log(req.getHeader("sec-websocket-key"));
+    // console.log(req.getHeader("sec-websocket-protocol"));
+    // console.log(req.getHeader("sec-websocket-extensions"));
 
     /* This immediately calls open handler, you must not use res after this call */
-    res.upgrade({
-        myData: req.getUrl() /* First argument is UserData (see WebSocket.getUserData()) */
+    res.upgrade(
+      {
+        url: req.getUrl() /* First argument is UserData (see WebSocket.getUserData()) */,
+        // query: req.getQuery(),
+        token: req.getHeader("sec-websocket-protocol")
       },
       /* Spell these correctly */
-      req.getHeader('sec-websocket-key'),
-      req.getHeader('sec-websocket-protocol'),
-      req.getHeader('sec-websocket-extensions'),
-      context
+      req.getHeader("sec-websocket-key"),
+      req.getHeader("sec-websocket-protocol"),
+      req.getHeader("sec-websocket-extensions"),
+      context,
     );
   },
 });

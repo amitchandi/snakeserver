@@ -1,4 +1,5 @@
 import { User } from "./models/User";
+import { UserDto } from "./models/User";
 
 export enum UserState {
     alive = 0,
@@ -16,9 +17,11 @@ export type Room = {
     roomName: string;
     isGameRoom: boolean;
     inGame: boolean;
-    ownerId: User["_id"]; // user id
+    // ownerId: User["_id"]; // user id
+    ownerId: string; // user id
     // users: inGameUser[];
-    users: Map<string, inGameUser>;
+    // users: Map<string, inGameUser>;
+    users: Map<string, UserDto>;
     settings: any;
 }
 

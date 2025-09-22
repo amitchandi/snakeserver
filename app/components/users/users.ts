@@ -79,20 +79,31 @@ function updateUsername(data: { username: string, newUsername: string }): boolea
 /**
  * Create the user with the given parameters
  */
-async function createUser(data: { email: string; username: string, password: string }) {
+export async function createUser(data: { email: string; username: string, password: string }) {
   try {
     const db = await getDb();
-    const collection = db.collection("users");
+    const collection = db.collection<User>("users");
     const user = await collection.findOne({ email: data.email });
     if (user) {
-      throw new Error("User with email already exists");
+      return {
+        status: "400",
+        message: "User with email already exists",
+        id: null,
+      };
     }
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    await collection.insertOne({
+    var res = await collection.insertOne({
       email: data.email,
       username: data.username,
       password: hashedPassword,
+      wins: 0,
+      gamesPlayed: 0
     });
+    return {
+      status: "201",
+      message: "User created successfully",
+      id: res.insertedId,
+    };
   } catch (error) {
     console.error(error);
     throw error;
