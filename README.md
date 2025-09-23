@@ -1,15 +1,16 @@
 
 # 🐍 SnakeServer
 
-SnakeServer is a TypeScript-based backend server for managing the classic Snake game with a twist. This repository provides the foundational logic to run a server for the multiplayer Snake game via a web interface or API.
+SnakeServer is the backend server for a multiplayer Snake game, built with TypeScript. This project provides the API, WebSocket real-time communication, and game logic for handling multiplayer sessions, player states, and game updates. Designed to be used with a frontend client for a complete gaming experience.
 
 ## ✨ Features
 
-- 🟦 Written in TypeScript for type safety and maintainability
-- ⚙️ Configurable environment via `.env`
-- 🧩 Modular structure for easy extensibility
-- 📦 Package management using npm
-- 🎮 Easily customizable game logic
+- 🟦 TypeScript codebase for type safety and maintainability
+- ⚙️ Environment-based configuration via `.env`
+- 🎮 Multiplayer game logic and session management
+- 🔌 Real-time updates using WebSockets
+- 📦 npm for dependency and script management
+- 🔌 API for game communication
 
 ## 📁 Project Structure
 
@@ -18,7 +19,7 @@ SnakeServer is a TypeScript-based backend server for managing the classic Snake 
 ├── .env                  # 🛠️ Environment variables
 ├── .gitignore            # 📄 Git ignore rules
 ├── .vscode/              # 💻 VSCode project settings
-├── app/                  # 🐍 Main application source code
+├── app/                  # 🐍 Main backend application source code
 ├── package.json          # 📦 Project dependencies and scripts
 ├── package-lock.json     # 🔒 Dependency lock file
 ├── tsconfig.json         # ⚙️ TypeScript configuration
@@ -42,15 +43,20 @@ npm install
 
 ### ⚙️ Configuration
 
-Copy the `.env` file and adjust the settings as needed to configure your server environment.
+Update your `.env` file to set up environment variables as needed for your server deployment.
 
 ### ▶️ Usage
 
-To start the server:
+To start the backend server:
 
 ```bash
 npm run start
 ```
+
+## 🔌 WebSocket Integration
+
+SnakeServer uses WebSockets for real-time communication between the backend and connected clients. This enables fast updates for multiplayer gameplay.  
+You’ll need a compatible frontend client to connect and interact with the server via WebSocket.
 
 ## 🤝 Contributing
 
@@ -64,6 +70,6 @@ This project currently does not specify a license. Please contact the repository
 
 - [amitchandi](https://github.com/amitchandi)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTYwODU0ODMwNCwtNzk3NTQ0NTkxLDE5MT
+eyJoaXN0b3J5IjpbMTcxMjIyMDczNCwtNzk3NTQ0NTkxLDE5MT
 k2Mjk4NTYsLTExMjUyMTczMDZdfQ==
 -->
