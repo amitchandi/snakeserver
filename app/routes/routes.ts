@@ -66,7 +66,7 @@ export function AddRoutes(
                 .writeHeader("Access-Control-Allow-Origin", "*")
                 .end();
             } else {
-              const token = jwt.sign({ id: loginRes.userId, email: data.email }, process.env.JWT_SECRET!, { expiresIn: "15m" });
+              const token = jwt.sign({ id: loginRes.userId, email: loginRes.email, username: loginRes.username }, process.env.JWT_SECRET!, { expiresIn: "15m" });
               loginRes.token = token;
               res.writeStatus(loginRes.status)
                 .writeHeader("Content-Type", "application/json")

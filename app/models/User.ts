@@ -1,5 +1,5 @@
-import { ObjectId, WithId } from "mongodb";
-import { inGameUser, UserState } from "../types";
+import { WithId } from "mongodb";
+import { UserState } from "../types";
 
 export interface User {
   // _id?: ObjectId;

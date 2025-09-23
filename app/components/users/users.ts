@@ -4,24 +4,6 @@ import { ObjectId } from "mongodb";
 import { User } from "../../models/User";
 
 const functions: Array<Function> = [];
-
-// const users: {[key: string]: User} = {
-//     '123': {
-//         id: v4(),
-//         deviceId: '123',
-//         name: 'Baby Snake',
-//         isReady: false,
-//         wins: 0,
-//     },
-//     '456': {
-//         id: v4(),
-//         deviceId: '456',
-//         name: 'Mama Snake',
-//         isReady: false,
-//         wins: 0,
-//     }
-// }; // temporary, will use mongo database
-
 /**
  * Get all users
  */

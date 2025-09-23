@@ -6,8 +6,12 @@ type LoginResponse = {
   valid: boolean;
   status: string;
   message: string;
-  token: string | null;
-  userId: string | null;
+  token?: string | null;
+  userId?: string;
+  email?: string;
+  username?: string;
+  wins?: number;
+  gamesPlayed?: number;
 };
 
 /**
@@ -24,8 +28,6 @@ export async function login(data: { email: string; password: string }) : Promise
         valid: false,
         status: "400 Bad Request",
         message: "Invalid Email or Password",
-        token: null,
-        userId: null
       };
     }
 
@@ -36,8 +38,6 @@ export async function login(data: { email: string; password: string }) : Promise
         valid: false,
         status: "400 Bad Request",
         message: "Invalid Email or Password",
-        token: null,
-        userId: null
       };
     }
 
@@ -46,7 +46,11 @@ export async function login(data: { email: string; password: string }) : Promise
       status: "200 OK",
       message: "",
       token: null,
-      userId: res._id.toString()
+      userId: res._id.toString(),
+      email: res.email,
+      username: res.username,
+      wins: res.wins,
+      gamesPlayed: res.gamesPlayed,
     };
   } catch (error) {
     console.error(error);
