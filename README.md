@@ -1,7 +1,7 @@
 
 # 🐍 SnakeServer
 
-SnakeServer is a TypeScript-based backend server for managing the classic Snake game. This repository provides the foundational logic to run a multiplayer or single-player Snake game via a web interface or API.
+SnakeServer is a TypeScript-based backend server for managing the classic Snake game with a twist. This repository provides the foundational logic to run a multiplayer Snake game via a web interface or API.
 
 ## ✨ Features
 
@@ -71,6 +71,6 @@ This project currently does not specify a license. Please contact the repository
 
 - [amitchandi](https://github.com/amitchandi)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTc5NzU0NDU5MSwxOTE5NjI5ODU2LC0xMT
-I1MjE3MzA2XX0=
+eyJoaXN0b3J5IjpbLTEyNTI3ODYzODQsLTc5NzU0NDU5MSwxOT
+E5NjI5ODU2LC0xMTI1MjE3MzA2XX0=
 -->
