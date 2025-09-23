@@ -18,7 +18,6 @@ SnakeServer is the backend server for a multiplayer Snake game, built with TypeS
 .
 ├── .env                  # 🛠️ Environment variables
 ├── .gitignore            # 📄 Git ignore rules
-├── .vscode/              # 💻 VSCode project settings
 ├── app/                  # 🐍 Main backend application source code
 ├── package.json          # 📦 Project dependencies and scripts
 ├── package-lock.json     # 🔒 Dependency lock file
@@ -70,6 +69,6 @@ This project currently does not specify a license. Please contact the repository
 
 - [amitchandi](https://github.com/amitchandi)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTcxMjIyMDczNCwtNzk3NTQ0NTkxLDE5MT
-k2Mjk4NTYsLTExMjUyMTczMDZdfQ==
+eyJoaXN0b3J5IjpbLTE4NDExMTk1MTQsLTc5NzU0NDU5MSwxOT
+E5NjI5ODU2LC0xMTI1MjE3MzA2XX0=
 -->
