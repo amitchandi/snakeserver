@@ -52,13 +52,6 @@ To start the server:
 npm run start
 ```
 
-Or, if TypeScript needs to be compiled:
-
-```bash
-npm run build
-npm run start
-```
-
 ## 🤝 Contributing
 
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
@@ -71,6 +64,6 @@ This project currently does not specify a license. Please contact the repository
 
 - [amitchandi](https://github.com/amitchandi)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyNTI3ODYzODQsLTc5NzU0NDU5MSwxOT
-E5NjI5ODU2LC0xMTI1MjE3MzA2XX0=
+eyJoaXN0b3J5IjpbMTE3Njc2NTgwMywtNzk3NTQ0NTkxLDE5MT
+k2Mjk4NTYsLTExMjUyMTczMDZdfQ==
 -->
