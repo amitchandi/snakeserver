@@ -67,6 +67,7 @@ export enum TileType {
 export type UserData = {
   userId?: string;
   username: string;
+  lobbyId?: string;
   isReady: boolean;
   event?: string;
   data?: object;

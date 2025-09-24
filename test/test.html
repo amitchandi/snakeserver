@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <script src="./CustomWebSocket.js"></script>
+        <script src="./script.js"></script>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.violet.min.css"
+        >
+    </head>
+    <body onload="main()">
+        <header class="container-fluid">
+            <article>
+                <table>
+                    <tr>
+                        <th style="width: 50px;">id</th>
+                        <th>email</th>
+                        <th>username</th>
+                        <th>wins</th>
+                        <th>games played</th>
+                    </tr>
+                    <tr>
+                        <td id="user_id"></td>
+                        <td id="user_email"></td>
+                        <td id="user_username"></td>
+                        <td id="user_wins"></td>
+                        <td id="user_games_played"></td>
+                    </tr>
+                </table>
+                <span id="loginrow"> Logged In?: <span id="token">False</span></span>
+            </article>
+        </header>
+        <main class="container-fluid">
+            <div class="grid">
+                <div>
+                    <article>
+                        <!-- Select -->
+                        <select id="loginSelect" name="select" aria-label="Select" required style="width: 150px" onchange="loginChange()">
+                        <!--<option selected disabled value="">Users</option>-->
+                        <option value="0">Mama</option>
+                        <option value="1">Baby</option>
+                        <option value="2">Dad</option>
+                        </select>
+                        <button id="btn_login" onclick="login()">login</button>
+                        <button id="btn_logout" onclick="logout()" disabled>logout</button>
+                        <button onclick="joinQueue()">Join Queue</button>
+                        <textarea title="chatlog" style="height: 200px" id="chatlog" readonly>Chat</textarea>
+                        <input id="message" placeholder="message" style="width: 300px" />
+                        <button onclick="sendChatMessage()">Send Message</button>
+                        <br />
+                        <input id="magnitude" placeholder="Snake Size" style="width: 150px" />
+                        <button onclick="eatPellet()">Eat Pellet</button>
+                        <button onclick="die()">die</button>
+                        <button onclick="zoom()">zoom</button>
+                    </article>
+                </div>
+
+                <div>
+                    <article>
+                        <h3>Players</h3>
+                        <ul id="lobbyPlayers">
+                        </ul>
+                    </article>
+                </div>
+            </div>
+
+        </main>
+    </body>
+</html>

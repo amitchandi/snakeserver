@@ -1,7 +1,6 @@
 import { WebSocket } from "uWebSockets.js";
 import { UserData } from "../types";
-import { activeUsers, lobbies } from "../matchmaking";
-import { toInGameUserDto } from "../models/User";
+import { activeUsers, lobbies, publishLobbyPlayers } from "../matchmaking";
 
 export async function uWSClose(ws: WebSocket<unknown>, code: number, message: ArrayBuffer) {
   /* The library guarantees proper unsubscription at close */
@@ -13,15 +12,18 @@ export async function uWSClose(ws: WebSocket<unknown>, code: number, message: Ar
     console.log(userData);
     if (userData.userId) {
       activeUsers.delete(userData.userId);
-      // TODO: Implement remove player from lobby
 
-      // const res = await users.getUserById(userData.userId!);
-      // if (!res) {
-      //   console.log("User not found");
-      //   return;
-      // }
-      // const user = toInGameUserDto(res);
-      // lobbies.delete(user._id);
+      if (!userData.lobbyId) return;
+      const lobby = lobbies.get(userData.lobbyId);
+      if (!lobby) return;
+
+      lobby.playerObjects?.delete(userData.userId);
+      console.log("lobby.playersObjects");
+      console.log(lobby.playerObjects);
+      lobby.players?.splice(lobby.players.indexOf(userData.userId), 1);
+      console.log("lobby.players");
+      console.log(lobby.players);
+      publishLobbyPlayers(lobby);
     }
   }
 

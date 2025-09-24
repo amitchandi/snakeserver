@@ -64,6 +64,7 @@ function createLobby() {
     const ws = activeUsers.get(p);
     if (!ws) return;
     ws.subscribe("lobby/" + lobbyId);
+    (ws.getUserData() as UserData).lobbyId = lobbyId;
     ws.send(JSON.stringify({
       event: "lobbyJoined",
       data: {

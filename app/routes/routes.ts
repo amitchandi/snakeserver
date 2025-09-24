@@ -1,6 +1,6 @@
 import { v4 } from "uuid";
 import uWS, { HttpRequest, HttpResponse } from "uWebSockets.js";
-import { readJson } from "../components/utils/ReadJSON";
+import { readJson } from "./ReadJSON";
 import { users } from "../components/";
 import { login } from "../auth";
 import jwt from "jsonwebtoken";
@@ -10,23 +10,6 @@ export function AddRoutes(
   components: { [key: string]: any },
 ) {
   app
-    // .get("/getToken", (res: HttpResponse, req: HttpRequest) => {
-    //   // record device id, ip address, time of request, send back tokent that will be used to
-    //   // authenticate user, along with creditantials, from this point forward
-    //   const token = jwt.sign()
-    //   res.end(id);
-    // })
-    // .get("/getUser/:deviceId", (res: HttpResponse, req: HttpRequest) => {
-    //   let user = components["getUserWithDevice"]({
-    //     deviceId: req.getParameter(0),
-    //   });
-    //   if (user) res.end(JSON.stringify(user));
-    //   else res.end("");
-    // })
-    // .get("/getRooms", (res: HttpResponse, req: HttpRequest) => {
-    //   //res.end(JSON.stringify(customFns['getRooms']()));
-    //   res.end(JSON.stringify(components["getRooms"]()));
-    // })
     .post("/createUser", (res: HttpResponse, req: HttpRequest) => {
       readJson(
         res,
@@ -51,7 +34,6 @@ export function AddRoutes(
       );
     })
     .post("/login", (res: HttpResponse, req: HttpRequest) => {
-
       readJson(
         res,
         async (data: any) => {
@@ -81,25 +63,6 @@ export function AddRoutes(
         },
       );
     })
-    // .post("/createRoom", (res: HttpResponse, req: HttpRequest) => {
-    //   readJson(
-    //     res,
-    //     (data: any) => {
-    //       let roomId = components["createRoom"]({
-    //         roomName: data.roomName,
-    //         isGameRoom: data.isGameRoom,
-    //         ownerId: data.ownerId,
-    //         settings: data.settings,
-    //       });
-
-    //       res.end(JSON.stringify(rooms.getRoomWithId(roomId)));
-    //     },
-    //     () => {
-    //       /* Request was prematurely aborted or invalid or missing, stop reading */
-    //       console.log("Invalid JSON or no data at all!");
-    //     },
-    //   );
-    // })
     .put("/updateUsername", (res: HttpResponse, req: HttpRequest) => {
       readJson(
         res,
@@ -118,13 +81,6 @@ export function AddRoutes(
         },
       );
     })
-    // .del("/deleteRoom/:roomId", (res: HttpResponse, req: HttpRequest) => {
-    //   components["deleteRoom"]({
-    //     id: req.getParameter(0),
-    //   });
-
-    //   res.end("Room delete. id:\n" + req.getParameter(0));
-    // })
     .any("/*", (res, req) => {
       res.writeHeader("Access-Control-Allow-Origin", "*");
       res.end("Nothing to see here!");
