@@ -4,6 +4,7 @@ import { readJson } from "./ReadJSON";
 import { users } from "../components/";
 import { login } from "../auth";
 import jwt from "jsonwebtoken";
+import { updateUsername } from "../users";
 
 export function AddRoutes(
   app: uWS.TemplatedApp,
@@ -34,6 +35,7 @@ export function AddRoutes(
       );
     })
     .post("/login", (res: HttpResponse, req: HttpRequest) => {
+      console.log("login request received");
       readJson(
         res,
         async (data: any) => {
@@ -66,14 +68,16 @@ export function AddRoutes(
     .put("/updateUsername", (res: HttpResponse, req: HttpRequest) => {
       readJson(
         res,
-        (data: any) => {
-          let updated = components["updateUsername"]({
-            name: data.name,
-            deviceId: data.deviceId,
-          });
+        async (data: any) => {
+          let updated = await updateUsername(
+            data.email,
+            data.newUsername,
+          );
 
-          if (updated) res.end("true");
-          else res.end("false");
+          res.cork(() => {
+            if (updated) res.end("true");
+            else res.end("false");
+          });
         },
         () => {
           /* Request was prematurely aborted or invalid or missing, stop reading */

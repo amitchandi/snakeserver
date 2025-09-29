@@ -28,6 +28,7 @@ export function open(ws: WebSocket<unknown>) {
     (err: any, decodedToken: any) => {
       if (err) {
         ws.close();
+        return;
       } else {
         activeUsers.set(decodedToken.id, ws);
         if (!queue.find((userId) => userId === decodedToken.id)) {
