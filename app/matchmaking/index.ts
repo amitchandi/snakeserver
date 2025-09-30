@@ -100,7 +100,7 @@ function lobbyTimerFN(lobby: Lobby) {
 
   app.publish("lobby/" + lobby.id, JSON.stringify({
     event: "startGame",
-    data: {},
+    data: null,
   }));
 }
 
