@@ -1,4 +1,3 @@
-import { v4 } from "uuid";
 import uWS, { HttpRequest, HttpResponse } from "uWebSockets.js";
 import { readJson } from "./ReadJSON";
 import { users } from "../components/";
@@ -6,11 +5,16 @@ import { login } from "../auth";
 import jwt from "jsonwebtoken";
 import { updateUsername } from "../users";
 
-export function AddRoutes(
-  app: uWS.TemplatedApp,
-  components: { [key: string]: any },
-) {
+export function AddRoutes(app: uWS.TemplatedApp) {
   app
+
+    // Default route
+    .any("/*", (res, req) => {
+      res.writeHeader("Access-Control-Allow-Origin", "*");
+      res.end("Nothing to see here!");
+    })
+
+    //User Management
     .post("/createUser", (res: HttpResponse, req: HttpRequest) => {
       readJson(
         res,
@@ -34,6 +38,28 @@ export function AddRoutes(
         },
       );
     })
+    .put("/updateUsername", (res: HttpResponse, req: HttpRequest) => {
+      readJson(
+        res,
+        async (data: any) => {
+          let updated = await updateUsername(
+            data.email,
+            data.newUsername,
+          );
+
+          res.cork(() => {
+            if (updated) res.end("true");
+            else res.end("false");
+          });
+        },
+        () => {
+          /* Request was prematurely aborted or invalid or missing, stop reading */
+          console.log("Invalid JSON or no data at all!");
+        },
+      );
+    })
+
+    //Authentication
     .post("/login", (res: HttpResponse, req: HttpRequest) => {
       console.log("login request received");
       readJson(
@@ -64,29 +90,5 @@ export function AddRoutes(
           console.log("Invalid JSON or no data at all!");
         },
       );
-    })
-    .put("/updateUsername", (res: HttpResponse, req: HttpRequest) => {
-      readJson(
-        res,
-        async (data: any) => {
-          let updated = await updateUsername(
-            data.email,
-            data.newUsername,
-          );
-
-          res.cork(() => {
-            if (updated) res.end("true");
-            else res.end("false");
-          });
-        },
-        () => {
-          /* Request was prematurely aborted or invalid or missing, stop reading */
-          console.log("Invalid JSON or no data at all!");
-        },
-      );
-    })
-    .any("/*", (res, req) => {
-      res.writeHeader("Access-Control-Allow-Origin", "*");
-      res.end("Nothing to see here!");
     });
 }

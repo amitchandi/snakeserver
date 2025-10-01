@@ -6,7 +6,6 @@ export function upgrade(res: HttpResponse, req: HttpRequest, context: us_socket_
   res.upgrade(
     {
       url: req.getUrl() /* First argument is UserData (see WebSocket.getUserData()) */,
-      // query: req.getQuery(),
       token: req.getHeader("sec-websocket-protocol"),
     },
     /* Spell these correctly */

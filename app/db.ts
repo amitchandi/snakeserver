@@ -6,7 +6,7 @@ let uri: string | null = null;
 const dbName = "snake";
 
 export async function initDb() {
-  uri = process.env.MONGO_URL as string;
+  uri = process.env.MONGO_URL;
   if (!uri) {
     throw new Error("MONGO_URL environment variable is not set");
   }

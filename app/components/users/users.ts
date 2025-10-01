@@ -50,15 +50,6 @@ export async function getUserWithEmail(email: string) {
 }
 
 /**
- * Update the name of the user with the given deviceId
- * @param data deviceId and new name
- */
-function updateUsername(data: { username: string, newUsername: string }): boolean {
-  //TODO: Implement updateUsername function
-  return false;
-}
-
-/**
  * Create the user with the given parameters
  */
 export async function createUser(data: { email: string; username: string, password: string }) {
@@ -110,10 +101,6 @@ async function addWin(data: { userId: string }) {
 }
 
 functions.push(getUsers);
-// functions.push(getUser);
-functions.push(updateUsername);
-// functions.push(getUserWithDevice);
-functions.push(createUser);
 functions.push(addWin);
 
 export { functions };

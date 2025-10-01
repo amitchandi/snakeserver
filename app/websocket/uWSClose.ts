@@ -8,8 +8,8 @@ export async function uWSClose(ws: WebSocket<unknown>, code: number, message: Ar
   console.log(code);
   if (code === 1000 || code === 1001 || code === 1006) {
     const userData = ws.getUserData() as UserData;
-    console.log("userData");
-    console.log(userData);
+    // console.log("userData");
+    // console.log(userData);
     if (userData.userId) {
       activeUsers.delete(userData.userId);
 
@@ -17,7 +17,8 @@ export async function uWSClose(ws: WebSocket<unknown>, code: number, message: Ar
       const lobby = lobbies.get(userData.lobbyId);
       if (!lobby) return;
 
-      lobby.playerObjects?.delete(userData.userId);
+      delete lobby.playerObjects[userData.userId];
+
       console.log("lobby.playersObjects");
       console.log(lobby.playerObjects);
       lobby.players?.splice(lobby.players.indexOf(userData.userId), 1);

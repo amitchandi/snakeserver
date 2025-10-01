@@ -1,5 +1,4 @@
 import { User } from "./models/User";
-import { UserDto } from "./models/User";
 
 export enum UserState {
   alive = 0,
@@ -10,19 +9,6 @@ export type inGameUser = {
   userInfo: User;
   gameState: UserState;
   isReady: boolean;
-};
-
-export type Room = {
-  id: string;
-  roomName: string;
-  isGameRoom: boolean;
-  inGame: boolean;
-  // ownerId: User["_id"]; // user id
-  ownerId: string; // user id
-  // users: inGameUser[];
-  // users: Map<string, inGameUser>;
-  users: Map<string, UserDto>;
-  settings: any;
 };
 
 export type GameState = {
@@ -71,6 +57,7 @@ export type UserData = {
   isReady: boolean;
   event?: string;
   data?: object;
+  gameState?: GameState;
 };
 
 export type WSMessage = {

@@ -22,7 +22,7 @@ class CustomWebSocket {
 
     this.send = function (event_name, event_data) {
       var payload = JSON.stringify({ event: event_name, data: event_data });
-      conn.send(payload); // <= send JSON data to socket server
+      this.conn.send(payload); // <= send JSON data to socket server
       return this;
     };
 
@@ -66,32 +66,6 @@ class CustomWebSocket {
       return JSON.parse(room);
     };
 
-    this.createRoom = async function (
-      roomName,
-      isGameRoom,
-      ownerId,
-      wallsToStart,
-    ) {
-      var myHeaders = new Headers();
-
-      var raw = JSON.stringify({
-        roomName: roomName,
-        isGameRoom: isGameRoom,
-        ownerId: ownerId,
-        settings: {
-          wallsToStart: wallsToStart,
-        },
-      });
-
-      var requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-      };
-
-      return await sendHTTPRequest("/createRoom", requestOptions);
-    };
-
     this.getUser = async function (userId) {
       var myHeaders = new Headers();
 
@@ -101,35 +75,6 @@ class CustomWebSocket {
       };
 
       return await sendHTTPRequest("/getUser/" + userId, requestOptions);
-    };
-
-    this.getRooms = async function () {
-      var myHeaders = new Headers();
-
-      var requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-      };
-
-      return await sendHTTPRequest("/getRooms", requestOptions);
-    };
-
-    this.createUser = async function () {
-      var myHeaders = new Headers();
-
-      var raw = JSON.stringify({
-        email: email,
-        username: username,
-        password: password,
-      });
-
-      var requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-      };
-
-      return await sendHTTPRequest("/createUser", requestOptions);
     };
   }
 }

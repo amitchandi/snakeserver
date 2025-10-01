@@ -1,5 +1,4 @@
 import uWS from "uWebSockets.js";
-import { components } from "./components";
 import { AddRoutes } from "./routes";
 import {
   upgrade,
@@ -10,7 +9,7 @@ import {
   open,
 } from "./websocket";
 
-const maxBackPressure: number = process.env.MAX_BACKPRESSURE! || 1024;
+const maxBackPressure: number = process.env.MAX_BACKPRESSURE || 1024;
 
 // an "app" is much like Express.js apps with URL routes,
 // here we handle WebSocket traffic on the wildcard "/*" route
@@ -28,6 +27,6 @@ const app = uWS.App().ws("/*", {
   subscription: subscription,
 });
 
-AddRoutes(app, components);
+AddRoutes(app);
 
 export { app };

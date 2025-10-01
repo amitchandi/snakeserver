@@ -23,7 +23,7 @@ export function open(ws: WebSocket<unknown>) {
 
   jwt.verify(
     token,
-    process.env.JWT_SECRET!,
+    process.env.JWT_SECRET,
     (err: any, decodedToken: any) => {
       jwtCallback(ws, err, decodedToken);
     },

@@ -3,6 +3,9 @@ import { v4 } from "uuid";
 import { app } from "../server";
 import { WebSocket } from "uWebSockets.js";
 import { UserData } from "../types";
+import { randomInt } from "crypto";
+import { toInGameUserDto, UserDto } from "../models/User";
+import { getUserById } from "../components/users/users";
 
 // Map of userId → WebSocket
 const activeUsers: Map<string, WebSocket<unknown>> = new Map();
@@ -57,18 +60,29 @@ function createLobby() {
     id: lobbyId,
     players,
     countdown: setTimeout(() => lobbyTimerFN(lobby), 5 * 1000),
+    wallsToStart: randomInt(5, 10),
+    playerObjects: {}
   };
   lobbies.set(lobbyId, lobby);
 
-  players.forEach(p => {
-    const ws = activeUsers.get(p);
+  players.forEach( async playerId => {
+    const user = await getUserById(playerId);
+    if (!user) return;
+    const userDto = toInGameUserDto(user);
+    lobby.playerObjects[playerId] = userDto;
+    const ws = activeUsers.get(playerId);
     if (!ws) return;
     ws.subscribe("lobby/" + lobbyId);
     (ws.getUserData() as UserData).lobbyId = lobbyId;
     ws.send(JSON.stringify({
       event: "lobbyJoined",
       data: {
-        lobbyId: lobby.id
+        lobby: {
+          id: lobby.id,
+          players: lobby.players,
+          playerObjects: lobby.playerObjects,
+          wallsToStart: lobby.wallsToStart
+        }
       }
     }));
   });

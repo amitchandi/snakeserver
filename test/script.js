@@ -2,6 +2,7 @@
 var ws;
 var user;
 var room;
+var lobby = null;
 
 function main() {
   let token = "";
@@ -20,7 +21,7 @@ var getRooms = async function () {
 
 var eatPellet = function () {
   ws.send("eatPellet", {
-    roomId: room.id,
+    lobbyId: lobby.id,
     args: {
       userId: user.id,
       magnitude: document.getElementById("magnitude").value,
@@ -30,7 +31,7 @@ var eatPellet = function () {
 
 var die = function () {
   ws.send("die", {
-    roomId: room.id,
+    lobbyId: lobby.id,
     userId: user.id,
     args: {
       userId: user.id,
@@ -41,7 +42,7 @@ var die = function () {
 
 var zoom = function () {
   ws.send("zoom", {
-    roomId: room.id,
+    lobbyId: lobby.id,
     args: {
       userId: user.id,
     },
@@ -50,7 +51,7 @@ var zoom = function () {
 
 // var sendReadyChange = function(setFalse) {
 //     ws.send('setReadyStatus', {
-//         roomId: room.id,
+//         lobbyId: lobby.id,
 //         userId: user.id,
 //         args: {
 //             userId: user.id,
@@ -62,7 +63,7 @@ var zoom = function () {
 var sendChatMessage = function () {
   var message = document.getElementById("message");
   ws.send("chatMessage", {
-    roomId: room.id,
+    lobbyId: lobby.id,
     args: {
       username: user.name,
       message: message.value,
@@ -72,7 +73,7 @@ var sendChatMessage = function () {
 };
 // var startGame = function() {
 //     ws.send('startGame', {
-//         roomId: room.id,
+//         lobbyId: lobby.id,
 //         args: {}
 //     });
 // }
@@ -93,6 +94,13 @@ async function login() {
   let response = await sendHTTPRequest("/login", requestOptions);
   console.log(response);
   if (response.valid) {
+    user = {
+      id: response.userId,
+      email: response.email,
+      username: response.username,
+      wins: response.wins,
+      gamesPlayed: response.gamesPlayed
+    }
     token = response.token;
     document.getElementById("token").innerHTML = "True";
     document.getElementById("loginrow").title =
@@ -212,7 +220,8 @@ function connectWebSocket() {
 
   //Lobby
   ws.bind("lobbyJoined", function (data) {
-    console.log(data);
+    console.log(data.lobby);
+    lobby = data.lobby;
   });
 
   ws.bind("lobbyPlayers", function (data) {

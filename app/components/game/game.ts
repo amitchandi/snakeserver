@@ -1,5 +1,5 @@
 import uWS, { WebSocket } from "uWebSockets.js";
-import { Room, UserState, UserData, inGameUser } from "../../types";
+import { UserState, UserData, inGameUser } from "../../types";
 import { users } from "../users";
 
 import { app } from "../../server";
@@ -7,28 +7,6 @@ import { UserDto } from "../../models/User";
 import { activeUsers, lobbies } from "../../matchmaking";
 
 const functions: Array<Function> = [];
-
-// /**
-//  Broadcast to room the user calling this action is ready
-//  */
-// function setReadyStatus(data: any, ws: WebSocket<UserData>) {
-//     let user = users.getUserById(data.userId);
-//     if (user !== undefined) {
-//         user.isReady = data.args.isReady;
-//         let room = rooms.getRoomWithId(ws.getUserData().lobbyId);
-//         let index = room.users.findIndex(user => {
-//             user.id === user.id;
-//         });
-//         room.users[index] = user;
-//     }
-//     app.publish('lobby/' + ws.getUserData().lobbyId, JSON.stringify({
-//         event: 'setReadyStatus',
-//         data: {
-//             room: rooms.getRoomWithId(ws.getUserData().lobbyId),
-//             args: data.args
-//         },
-//     }));
-// }
 
 /**
  * Send 'eatPellet' event to room with the given id
@@ -67,7 +45,7 @@ function die(data: any, ws: WebSocket<UserData>) {
   if (!lobby) return;
   if (!lobby.playerObjects) return;
 
-  const player = lobby.playerObjects.get(userData.userId)
+  const player = lobby.playerObjects[userData.userId];
   if (!player) return;
 
   player.gameState = UserState.dead;
@@ -75,11 +53,12 @@ function die(data: any, ws: WebSocket<UserData>) {
   // check if any other players still alive in room, if not, send win event to room
 
   let alive: UserDto[] = [];
-  lobby.playerObjects.forEach((player) => {
-    if (player.gameState == UserState.alive) {
+  for (const [key, user] of Object.entries(lobby.playerObjects)) {
+    if (user.gameState == UserState.alive) {
       alive.push(player);
     }
-  });
+  }
+
   if (alive.length == 1) {
     winner(
       {
@@ -171,29 +150,31 @@ function invincible(data: any, ws: WebSocket<UserData>) {
  * Set the Game State of the user with the given userId
  */
 async function setGameState(data: any, ws: WebSocket<UserData>) {
-  let user = await users.getUserById(data.args.userId);
-  if (user !== undefined) {
-    // user.gameState = data.args.gameState;
-    console.log(data.args.gameState);
+  try {
+    const userData = ws.getUserData();
+    userData.gameState = data.args.gameState;
+  } catch (error) {
+    console.error(error);
   }
 }
 
 /**
  * Get the Game State of the user with the given userId
  */
-// async function getGameState(data: any, ws: WebSocket<UserData>) {
-//   let user = await users.getUserById(data.args.userId);
-//     if (user !== undefined) {
-//         ws.send(JSON.stringify({
-//             event: 'getGameState',
-//             data: {
-//                 userId: user.id,
-//                 username: user.name,
-//                 gameState: user.gameState,
-//             }
-//         }));
-//     }
-// }
+async function getGameState(data: any, ws: WebSocket<UserData>) {
+  let websocket = activeUsers.get(data.args.userId);
+  if (!websocket) return;
+
+  const userData = websocket.getUserData() as UserData;
+  ws.send(JSON.stringify({
+    event: 'getGameState',
+    data: {
+        userId: userData.userId,
+        username: userData.username,
+        gameState: userData.gameState,
+    }
+  }));
+}
 
 functions.push(eatPellet);
 functions.push(die);
@@ -203,6 +184,6 @@ functions.push(zoom);
 functions.push(slow);
 functions.push(invincible);
 functions.push(setGameState);
-// functions.push(getGameState);
+functions.push(getGameState);
 
 export { functions };
