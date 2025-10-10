@@ -1,17 +1,17 @@
 import uWS, { HttpRequest, HttpResponse } from "uWebSockets.js";
 import { readJson } from "./ReadJSON";
-import { users } from "../components/";
+import { users } from "../components";
 import { login } from "../auth";
 import jwt from "jsonwebtoken";
 import { updateUsername } from "../users";
+import { endResponseJSON, endResponse } from "./helperFunctions";
 
-export function AddRoutes(app: uWS.TemplatedApp) {
+export function AddMainRoutes(app: uWS.TemplatedApp) {
   app
 
     // Default route
     .any("/*", (res, req) => {
-      res.writeHeader("Access-Control-Allow-Origin", "*");
-      res.end("Nothing to see here!");
+      endResponse(res, "200", "Nothing to see here!");
     })
 
     //User Management
@@ -24,13 +24,9 @@ export function AddRoutes(app: uWS.TemplatedApp) {
             email: data.email,
             username: data.username,
             password: data.password,
-          })
-          res.cork(() => {
-            res.writeStatus(userRes.status)
-              .writeHeader("Content-Type", "application/json")
-              .writeHeader("Access-Control-Allow-Origin", "*")
-              .end(JSON.stringify(userRes));
           });
+
+          res.cork(() => endResponseJSON(res, userRes.status, userRes));
         },
         () => {
           /* Request was prematurely aborted or invalid or missing, stop reading */
@@ -48,8 +44,8 @@ export function AddRoutes(app: uWS.TemplatedApp) {
           );
 
           res.cork(() => {
-            if (updated) res.end("true");
-            else res.end("false");
+            if (updated) endResponse(res, "200", "true");
+            else endResponse(res, "200", "false");
           });
         },
         () => {
@@ -72,16 +68,11 @@ export function AddRoutes(app: uWS.TemplatedApp) {
 
           res.cork(() => {
             if (!loginRes.valid) {
-              res.writeStatus(loginRes.status)
-                .writeHeader("Access-Control-Allow-Origin", "*")
-                .end();
+              endResponse(res, loginRes.status, "");
             } else {
               const token = jwt.sign({ id: loginRes.userId, email: loginRes.email, username: loginRes.username }, process.env.JWT_SECRET!, { expiresIn: "15m" });
               loginRes.token = token;
-              res.writeStatus(loginRes.status)
-                .writeHeader("Content-Type", "application/json")
-                .writeHeader("Access-Control-Allow-Origin", "*")
-                .end(JSON.stringify(loginRes));
+              endResponseJSON(res, loginRes.status, loginRes);
             }
           });
         },

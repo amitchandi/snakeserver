@@ -43,7 +43,7 @@ function startQueueTimer() {
     }, QUEUE_TIMEOUT);
 }
 
-function createLobby() {
+async function createLobby() {
   if (queueTimer) {
     clearTimeout(queueTimer);
     queueTimer = null;
@@ -65,31 +65,37 @@ function createLobby() {
   };
   lobbies.set(lobbyId, lobby);
 
-  players.forEach( async playerId => {
-    const user = await getUserById(playerId);
-    if (!user) return;
-    const userDto = toInGameUserDto(user);
-    lobby.playerObjects[playerId] = userDto;
-    const ws = activeUsers.get(playerId);
-    if (!ws) return;
-    ws.subscribe("lobby/" + lobbyId);
-    (ws.getUserData() as UserData).lobbyId = lobbyId;
-    ws.send(JSON.stringify({
-      event: "lobbyJoined",
-      data: {
-        lobby: {
-          id: lobby.id,
-          players: lobby.players,
-          playerObjects: lobby.playerObjects,
-          wallsToStart: lobby.wallsToStart
+  const tasks = players.map(playerId =>
+    new Promise<void>(async (resolve) => {
+      const user = await getUserById(playerId);
+      if (!user) return;
+      const userDto = toInGameUserDto(user);
+      lobby.playerObjects[playerId] = userDto;
+      const ws = activeUsers.get(playerId);
+      if (!ws) return;
+      ws.subscribe("lobby/" + lobbyId);
+      console.log("lobby sub");
+      (ws.getUserData() as UserData).lobbyId = lobbyId;
+      ws.send(JSON.stringify({
+        event: "lobbyJoined",
+        data: {
+          lobby: {
+            id: lobby.id,
+            players: lobby.players,
+            playerObjects: lobby.playerObjects,
+            wallsToStart: lobby.wallsToStart
+          }
         }
-      }
-    }));
-  });
-
-  publishLobbyPlayers(lobby);
+      }));
+      resolve();
+    })
+  );
 
   console.log(new Date() + `: Lobby ${lobbyId} created.`);
+
+  await Promise.all(tasks);
+  publishLobbyPlayers(lobby);
+
 }
 
 function publishLobbyPlayers(lobby: Lobby) {
@@ -100,7 +106,6 @@ function publishLobbyPlayers(lobby: Lobby) {
     const userData = ws.getUserData() as UserData;
     players.push(userData.username);
   });
-
   app.publish("lobby/" + lobby.id, JSON.stringify({
     event: "lobbyPlayers",
     data: {

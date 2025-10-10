@@ -1,4 +1,11 @@
 import { User } from "./models/User";
+// import { HttpResponse } from "uWebSockets.js";
+
+// declare module "uWebSockets.js" {
+//   export interface HttpResponse {
+//     myEnd?(): HttpResponse;
+//   }
+// }
 
 export enum UserState {
   alive = 0,

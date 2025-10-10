@@ -19,12 +19,16 @@ export async function uWSClose(ws: WebSocket<unknown>, code: number, message: Ar
 
       delete lobby.playerObjects[userData.userId];
 
-      console.log("lobby.playersObjects");
-      console.log(lobby.playerObjects);
+      // console.log("lobby.playersObjects");
+      // console.log(lobby.playerObjects);
       lobby.players?.splice(lobby.players.indexOf(userData.userId), 1);
-      console.log("lobby.players");
-      console.log(lobby.players);
-      publishLobbyPlayers(lobby);
+      // console.log("lobby.players");
+      // console.log(lobby.players);
+      if (lobby.players.length === 0) {
+        lobbies.delete(userData.lobbyId);
+      } else {
+        publishLobbyPlayers(lobby);
+      }
     }
   }
 
